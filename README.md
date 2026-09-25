@@ -107,5 +107,38 @@ A complete, full-stack web application and interactive 3D WebGL simulator design
 
 ---
 
+## ⚡ Turso Database Setup for Vercel Deployment
+
+To deploy on Vercel without native GLIBC / SQLite file locking issues, this project uses **Turso** (hosted libSQL over HTTP).
+
+### 1. Create a Free Turso Database
+```bash
+# Install Turso CLI
+brew install tursodatabase/tap/turso
+
+# Login & Create Database
+turso auth login
+turso db create hazard-db
+
+# Get Database URL and Auth Token
+turso db show hazard-db --url
+turso db tokens create hazard-db
+```
+
+### 2. Set Environment Variables on Vercel
+Go to **Vercel Dashboard** -> **Project Settings** -> **Environment Variables** and add:
+- `TURSO_DATABASE_URL`: `libsql://hazard-db-[username].turso.io`
+- `TURSO_AUTH_TOKEN`: `your-turso-jwt-token`
+- `JWT_SECRET`: `your_secure_secret_key`
+
+### 3. Migrate Local Data to Turso (Optional)
+Run the migration script to push your local SQLite data to Turso:
+```bash
+npm run db:migrate-turso
+```
+
+---
+
 ## 📜 License
 University of Sunderland Enterprise Health & Safety Project. All rights reserved.
+

@@ -9,7 +9,12 @@ try {
 }
 
 // Initialize database & seed data
-require('./db');
+const db = require('./db');
+if (db && typeof db.initDb === 'function') {
+  db.initDb().catch((err) => {
+    console.error('⚠️ DB Initialization warning:', err.message);
+  });
+}
 
 const { router: authRouter } = require('./routes/auth');
 const gameRouter = require('./routes/game');

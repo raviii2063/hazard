@@ -1,5 +1,9 @@
 node_modules/
 database.sqlite
 .env
+.env.local
+.env.*.local
 .DS_Store
 *.log
+.vercel
+scripts/*.local.js
