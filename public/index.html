@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Warehouse Hazard Perception — 360° Training Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js 3D Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- TOP GLOBAL NAVBAR -->
+  <header class="navbar">
+    <div class="nav-brand" id="nav-logo-link" style="cursor: pointer;">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">HAZARD HUNT 360°</span>
+        <span class="brand-sub">AUTOMOTIVE LOGISTICS SAFETY SIMULATOR</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div id="user-badge" class="user-pill">
+        <span class="user-role role-guest">GUEST</span>
+        <div class="user-info">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="user-display-name" class="user-name">Not Logged In</span>
+        </div>
+      </div>
+
+      <button id="btn-sound-toggle" class="icon-btn" title="Toggle Sound FX">
+        <svg id="sound-icon-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        <svg id="sound-icon-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      </button>
+
+      <button id="btn-nav-auth" class="nav-btn btn-amber">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In / Register
+      </button>
+
+      <button id="btn-nav-dashboard" class="nav-btn btn-slate" style="display: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Player Portal
+      </button>
+
+      <button id="btn-nav-admin" class="nav-btn btn-admin" style="display: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Admin Portal
+      </button>
+
+      <button id="btn-nav-logout" class="nav-btn btn-outline" style="display: none;">
+        Logout
+      </button>
+    </div>
+  </header>
+
+  <div class="app-container">
+
+    <!-- 1. LANDING / INTRO SCREEN WITH DISTINCT PLAYER & ADMIN PORTALS -->
+    <div id="screen-intro" class="screen active">
+      <div class="hero-card">
+        <div class="badge-tag yellow-tag">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 22h20L12 2z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          University Enterprise Health & Safety Project
+        </div>
+        <h1 class="main-title">360° Warehouse Hazard Perception Simulator</h1>
+        <p class="subtitle">
+          Step into a virtual 3D automotive logistics warehouse. Look in every direction using mouse or touchpad, walk through high-bay aisles, spot developing workplace hazards before they cause injury, and complete safety quizzes (100 Max Score).
+        </p>
+
+        <!-- TWO DISTINCT DUAL-PORTAL CARDS -->
+        <h3 class="subsection-title" style="margin-bottom: 1rem; color: var(--accent-yellow);">Select Portal Entrance:</h3>
+        <div class="portal-selection-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          
+          <!-- PLAYER PORTAL CARD -->
+          <div class="portal-card player-portal-card" style="background: rgba(30, 41, 59, 0.7); border: 2px solid var(--accent-yellow); border-radius: var(--radius-md); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="badge-tag yellow-tag" style="margin-bottom: 0.75rem;">🎮 PLAYER PORTAL</div>
+              <h2 style="font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Trainee & Operator Portal</h2>
+              <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem;">
+                For warehouse operators, trainees, and students. Take 360° hazard perception challenges, test your response time, answer easy safety quizzes, and build your 100-point training score certificate.
+              </p>
+            </div>
+            <button id="btn-enter-player-portal" class="btn btn-primary btn-lg" style="width: 100%;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Enter Player Portal
+            </button>
+          </div>
+
+          <!-- ADMIN PORTAL CARD -->
+          <div class="portal-card admin-portal-card" style="background: rgba(30, 41, 59, 0.7); border: 2px solid var(--accent-purple); border-radius: var(--radius-md); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="badge-tag admin-tag" style="margin-bottom: 0.75rem;">🛡️ ADMIN PORTAL</div>
+              <h2 style="font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Safety Instructor & Admin Portal</h2>
+              <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem;">
+                For Health & Safety officers, instructors, and managers. Inspect real SQLite analytics, view class performance charts, track individual trainee logs, and manage scenarios & quizzes.
+              </p>
+            </div>
+            <button id="btn-enter-admin-portal" class="btn btn-admin btn-lg" style="width: 100%;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Enter Admin Portal
+            </button>
+          </div>
+
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon amber-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="feature-title">Touchpad & Mouse 360° Look</div>
+            <div class="feature-desc">Drag with your laptop touchpad or touch screen to look 360° in every direction smoothly without needing a physical mouse.</div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon blue-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="feature-title">Easy Hazard Spotting (Glowing Beacons)</div>
+            <div class="feature-desc">Active hazards feature glowing yellow beacons and wide detection ranges, making spotting straightforward and engaging.</div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon green-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="feature-title">Educational Hazard Revelation</div>
+            <div class="feature-desc">If any hazard is missed, the end-of-game report reveals its exact location and correct safety action for maximum learning.</div>
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <button id="btn-intro-rules" class="btn btn-secondary btn-lg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Instructions & Touchpad Controls Guide
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. INSTRUCTIONS / HOW TO PLAY SCREEN -->
+    <div id="screen-rules" class="screen">
+      <div class="card card-wide">
+        <div class="card-header-flex">
+          <div>
+            <div class="badge-tag yellow-tag">Simulator Training Manual</div>
+            <h2 class="section-title">Hazard Perception Gameplay & Touchpad Controls</h2>
+          </div>
+          <button id="btn-rules-back" class="btn btn-secondary">Back to Main Menu</button>
+        </div>
+
+        <div class="rules-grid">
+          <div class="rule-box">
+            <div class="rule-num">1</div>
+            <h3>360° Looking (Touchpad & Mouse)</h3>
+            <p>Look around the 3D warehouse environment smoothly using multiple input methods:</p>
+            <ul class="rule-list">
+              <li><strong>Touchpad / Touch Screen:</strong> Click/touch and <strong>Drag</strong> anywhere on the 3D view to rotate camera 360°.</li>
+              <li><strong>Mouse Pointer Lock:</strong> Click the 3D view to lock mouse for high-sensitivity aiming.</li>
+              <li><kbd>W</kbd> / <kbd>A</kbd> / <kbd>S</kbd> / <kbd>D</kbd> or Arrow Keys to walk around.</li>
+              <li>Use the on-screen <strong>Virtual D-Pad</strong> to walk on laptop touchpads or mobile displays.</li>
+            </ul>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-num">2</div>
+            <h3>Easy Hazard Spotting</h3>
+            <p>Search the warehouse for dangerous situations:</p>
+            <ul class="rule-list">
+              <li>Look for glowing yellow pulsing beacon rings on the floor.</li>
+              <li>Aim your center crosshair directly at a potential hazard object.</li>
+              <li>Press <kbd>E</kbd>, Left Click, or tap the on-screen <strong>⚠️ SPOT HAZARD</strong> button.</li>
+              <li>Select the correct hazard category to earn 20 points!</li>
+            </ul>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-num">3</div>
+            <h3>Scoring & Continuous Flow</h3>
+            <p>Maximise your training score:</p>
+            <ul class="rule-list">
+              <li><strong>Max Score:</strong> 100 Points per scenario.</li>
+              <li><strong>Continuous Flow:</strong> After identifying a hazard, you immediately resume walking without re-clicking!</li>
+              <li><strong>Educational Reveal:</strong> Any missed hazards are fully revealed at the end with safe solutions.</li>
+            </ul>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-num">4</div>
+            <h3>Educational Safety Quiz</h3>
+            <p>Consolidate your safety learning:</p>
+            <ul class="rule-list">
+              <li>Complete 5 practical, easy-to-understand safety quiz questions.</li>
+              <li>Review instant feedback and detailed safety guidance explanations.</li>
+              <li>Your overall score (out of 100) is saved to SQLite.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <button id="btn-rules-start-now" class="btn btn-primary btn-lg">
+            Proceed to Player Portal
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PLAYER DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="screen">
+      <div class="card card-wide">
+        <div class="dashboard-header">
+          <div>
+            <div class="badge-tag green-tag">Logistics Operator Dashboard</div>
+            <h2 id="dash-welcome-text" class="section-title">Welcome, Trainee</h2>
+            <p class="section-desc">Select a 360° warehouse scenario below to start your hazard perception training (100 Max Points).</p>
+          </div>
+          <button id="btn-dash-history" class="btn btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+            My Attempt History
+          </button>
+        </div>
+
+        <!-- PLAYER METRICS KPI GRID (100 SCORE SCALE) -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon yellow-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div>
+              <div class="stat-num" id="dash-stat-high">0 / 100</div>
+              <div class="stat-label">Highest Score</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon blue-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div>
+              <div class="stat-num" id="dash-stat-avg">0.0 / 100</div>
+              <div class="stat-label">Average Score</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div class="stat-num" id="dash-stat-hazards">0</div>
+              <div class="stat-label">Hazards Identified</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon purple-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div>
+              <div class="stat-num" id="dash-stat-games">0</div>
+              <div class="stat-label">Total Games Completed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCENARIOS SELECTION GRID -->
+        <h3 class="subsection-title" style="margin-top: 2rem;">Available 360° Warehouse Scenarios</h3>
+        <div id="scenarios-container" class="scenarios-grid">
+          <!-- Dynamically populated scenario cards -->
+        </div>
+
+        <!-- RECENT ACTIVITY TABLE -->
+        <h3 class="subsection-title" style="margin-top: 2rem;">Recent Training Attempts</h3>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Scenario</th>
+                <th>Score (Max 100)</th>
+                <th>Accuracy</th>
+                <th>Hazards Found</th>
+                <th>Avg Reaction</th>
+                <th>Quiz Score</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-tbody">
+              <tr><td colspan="7" class="text-center">No previous training attempts recorded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ACTIVE 3D GAMEPLAY SCREEN -->
+    <div id="screen-game" class="screen">
+      <!-- GAMEPLAY HUD HEADER -->
+      <div class="game-hud-top">
+        <div class="hud-group">
+          <div class="hud-pill">
+            <span class="hud-lbl">ZONE</span>
+            <span id="hud-scenario-title" class="hud-val">Walkway Aisle</span>
+          </div>
+          <div class="hud-pill">
+            <span class="hud-lbl">TIME LEFT</span>
+            <span id="hud-timer-val" class="hud-val timer-normal">120s</span>
+          </div>
+        </div>
+
+        <div class="hud-group">
+          <div class="hud-pill">
+            <span class="hud-lbl">SCORE</span>
+            <span id="hud-score-val" class="hud-val score-highlight">0</span>
+          </div>
+          <div class="hud-pill">
+            <span class="hud-lbl">SPOTTED</span>
+            <span id="hud-found-val" class="hud-val">0 / 5</span>
+          </div>
+        </div>
+
+        <div class="hud-actions">
+          <button id="btn-game-help" class="hud-btn" title="Controls Help">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+          <button id="btn-game-pause" class="hud-btn" title="Pause Game">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D VIEWPORT CONTAINER -->
+      <div id="viewport-container" class="viewport-frame">
+        <!-- Three.js 3D WebGL Canvas -->
+        <canvas id="three-canvas" style="touch-action: none;"></canvas>
+
+        <!-- CENTER AIM CROSSHAIR -->
+        <div id="game-crosshair" class="crosshair-indicator">
+          <div class="crosshair-dot"></div>
+        </div>
+
+        <!-- TARGETED HAZARD INTERACTION PROMPT -->
+        <div id="hazard-prompt" class="hazard-prompt-banner" style="display: none;">
+          <div class="prompt-icon">⚠️</div>
+          <div class="prompt-text">
+            <strong id="prompt-hazard-name">POTENTIAL HAZARD TARGETED</strong>
+            <span>Press <kbd>E</kbd> / Click / Tap Spot Button</span>
+          </div>
+        </div>
+
+        <!-- ON-SCREEN VIRTUAL D-PAD MOVEMENT CONTROLS (BOTTOM LEFT) -->
+        <div id="dpad-container" class="dpad-container">
+          <button id="btn-move-fwd" class="dpad-btn dpad-up" title="Walk Forward (W)">▲</button>
+          <button id="btn-move-left" class="dpad-btn dpad-left" title="Strafe Left (A)">◄</button>
+          <button id="btn-move-back" class="dpad-btn dpad-down" title="Walk Backward (S)">▼</button>
+          <button id="btn-move-right" class="dpad-btn dpad-right" title="Strafe Right (D)">►</button>
+        </div>
+
+        <!-- ON-SCREEN TOUCH / TOUCHPAD SPOT HAZARD BUTTON (BOTTOM RIGHT) -->
+        <button id="btn-touch-spot" class="touch-spot-btn" title="Identify Targeted Hazard (E)">
+          ⚠️ SPOT HAZARD (E)
+        </button>
+
+        <!-- TOUCHPAD & MOUSE DRAG INSTRUCTION OVERLAY -->
+        <div id="pointerlock-banner" class="pointerlock-overlay">
+          <div class="pl-content">
+            <div class="pl-icon">🖱️</div>
+            <h3>Touchpad & Mouse 360° Controls Ready</h3>
+            <p style="margin-bottom: 0.5rem; color: var(--accent-yellow); font-weight: 700;">
+              • Touchpad / Touch: Drag on 3D View to Look 360°<br>
+              • D-Pad / WASD: Walk Around | Tap "SPOT HAZARD" Button to Identify
+            </p>
+            <button id="btn-start-gameplay-touch" class="btn btn-primary" style="margin-top: 0.5rem;">
+              Click / Tap to Start Playing
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER FEEDBACK BANNER -->
+      <div class="game-hud-bottom">
+        <div id="feedback-banner" class="feedback-banner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="feedback-text">Look for glowing yellow hazard beacons on the floor. Drag touchpad to look 360°. Walk through the aisle!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. END-OF-SCENARIO QUIZ SCREEN -->
+    <div id="screen-quiz" class="screen">
+      <div class="card card-wide" style="max-width: 800px; margin: 0 auto;">
+        <div class="badge-tag blue-tag">Post-Scenario Safety Assessment</div>
+        <h2 class="section-title">Practical Workplace Safety Quiz</h2>
+        <p class="section-desc">Answer 5 practical safety questions directly based on hazards in this scenario.</p>
+
+        <div id="quiz-container" class="quiz-container">
+          <!-- Quiz questions injected here -->
+        </div>
+
+        <div style="text-align: right; margin-top: 1.5rem;">
+          <button id="btn-quiz-submit" class="btn btn-primary btn-lg">
+            Submit Answers & View Results
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. GAME RESULTS & CERTIFICATE SCREEN (MAX SCORE 100 + MISSED HAZARDS REVEAL) -->
+    <div id="screen-results" class="screen">
+      <div class="card card-wide" style="max-width: 850px; margin: 0 auto;">
+        <div class="results-header">
+          <div class="score-ring">
+            <div id="res-score-num" class="score-num">0</div>
+            <div id="res-score-max" class="score-max">OUT OF 100</div>
+          </div>
+
+          <div id="res-rating-badge" class="rating-badge">PASS — SAFETY CONSCIOUS</div>
+          <h2 id="res-scenario-name" class="results-title">Scenario Performance Summary</h2>
+          <p id="res-feedback-desc" class="results-desc">Evaluating performance data...</p>
+
+          <div id="db-save-status" class="db-status-msg"></div>
+        </div>
+
+        <!-- RESULTS METRICS BREAKDOWN -->
+        <div class="results-stats-grid">
+          <div class="res-stat-box">
+            <span class="res-val" id="res-val-accuracy">0%</span>
+            <span class="res-lbl">Accuracy</span>
+          </div>
+          <div class="res-stat-box">
+            <span class="res-val" id="res-val-found">0 / 0</span>
+            <span class="res-lbl">Hazards Spotted</span>
+          </div>
+          <div class="res-stat-box">
+            <span class="res-val" id="res-val-reaction">0.0s</span>
+            <span class="res-lbl">Avg Reaction Time</span>
+          </div>
+          <div class="res-stat-box">
+            <span class="res-val" id="res-val-quiz">0 / 5</span>
+            <span class="res-lbl">Quiz Score</span>
+          </div>
+        </div>
+
+        <!-- EDUCATIONAL REVEAL BOX FOR MISSED HAZARDS -->
+        <div id="res-missed-hazards-box"></div>
+
+        <!-- HAZARD ITEMIZATION TABLE -->
+        <h3 class="subsection-title" style="margin-top: 1.5rem;">Hazards Spotting Breakdown</h3>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Hazard Name</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Points</th>
+                <th>Safety Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="res-hazards-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="disclaimer-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>This simulation score is an academic workplace safety training result and does not replace formal HSE equipment licensing.</span>
+        </div>
+
+        <div class="btn-group" style="justify-content: center; margin-top: 1.5rem;">
+          <button id="btn-res-replay" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            Replay Scenario
+          </button>
+          <button id="btn-res-dashboard" class="btn btn-secondary">
+            Return to Player Portal
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. ADMIN PORTAL SCREEN -->
+    <div id="screen-admin" class="screen">
+      <div class="card card-wide">
+        <div class="admin-header-flex">
+          <div>
+            <div class="badge-tag admin-tag">
+              🛡️ Safety Instructor & Admin Portal
+            </div>
+            <h2 class="section-title">Warehouse Training Administration</h2>
+            <p class="section-desc">Manage registered players, inspect real-time SQLite safety analytics, and edit hazard scenarios.</p>
+          </div>
+          <button id="btn-admin-close" class="btn btn-secondary">Close Admin Portal</button>
+        </div>
+
+        <!-- ADMIN METRICS CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue-bg">👥</div>
+            <div>
+              <div class="stat-num" id="adm-stat-players">0</div>
+              <div class="stat-label">Registered Players</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon purple-bg">🎮</div>
+            <div>
+              <div class="stat-num" id="adm-stat-sessions">0</div>
+              <div class="stat-label">Total Completed Sessions</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon yellow-bg">⭐</div>
+            <div>
+              <div class="stat-num" id="adm-stat-avg-score">0.0 / 100</div>
+              <div class="stat-label">Class Average Score</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green-bg">🎯</div>
+            <div>
+              <div class="stat-num" id="adm-stat-accuracy">0%</div>
+              <div class="stat-label">Average Accuracy</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon amber-bg">⚡</div>
+            <div>
+              <div class="stat-num" id="adm-stat-reaction">0.0s</div>
+              <div class="stat-label">Avg Reaction Time</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PERFORMANCE CHARTS SECTION -->
+        <div class="admin-charts-grid" style="margin-top: 1.5rem;">
+          <div class="chart-card">
+            <h4>Player Accuracy Distribution (%)</h4>
+            <canvas id="chart-accuracy" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <h4>Scenario Completion Metrics</h4>
+            <canvas id="chart-completion" height="200"></canvas>
+          </div>
+        </div>
+
+        <!-- ADMIN NAVIGATION TABS -->
+        <div class="tab-bar" style="margin-top: 2rem;">
+          <button id="tab-btn-players" class="tab-btn active">👥 Registered Players</button>
+          <button id="tab-btn-sessions" class="tab-btn">📜 Game Sessions Log</button>
+          <button id="tab-btn-scenarios" class="tab-btn">⚙️ Scenario & Hazard Manager</button>
+          <button id="tab-btn-quizzes" class="tab-btn">❓ Quiz Question Bank</button>
+        </div>
+
+        <!-- TAB 1: REGISTERED PLAYERS -->
+        <div id="tab-view-players" class="tab-content active">
+          <div class="filter-bar">
+            <input type="text" id="admin-search-players" class="form-input" placeholder="Search player by name, username, or email...">
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Full Name</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Joined</th>
+                  <th>Sessions</th>
+                  <th>Best Score</th>
+                  <th>Avg Accuracy</th>
+                  <th>Avg Reaction</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adm-players-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: GAME SESSIONS LOG -->
+        <div id="tab-view-sessions" class="tab-content">
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Session ID</th>
+                  <th>Player</th>
+                  <th>Scenario</th>
+                  <th>Score (Max 100)</th>
+                  <th>Accuracy</th>
+                  <th>Hazards Found</th>
+                  <th>Avg Reaction</th>
+                  <th>Quiz</th>
+                  <th>Date & Time</th>
+                </tr>
+              </thead>
+              <tbody id="adm-sessions-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: SCENARIO & HAZARD MANAGER -->
+        <div id="tab-view-scenarios" class="tab-content">
+          <div class="tab-actions">
+            <button id="btn-admin-add-scenario" class="btn btn-primary">
+              + Add New Scenario
+            </button>
+            <button id="btn-admin-add-hazard" class="btn btn-secondary">
+              + Add Hazard to Scenario
+            </button>
+          </div>
+
+          <h4 style="margin-top: 1rem; color: var(--accent-yellow);">Configured 3D Scenarios</h4>
+          <div id="adm-scenarios-list" class="scenarios-grid"></div>
+
+          <h4 style="margin-top: 2rem; color: var(--accent-yellow);">Scenario Hazards Database</h4>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Scenario</th>
+                  <th>Hazard Name</th>
+                  <th>Category</th>
+                  <th>Difficulty</th>
+                  <th>3D Coordinates (X, Y, Z)</th>
+                  <th>Score Value</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adm-hazards-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: QUIZ QUESTION BANK -->
+        <div id="tab-view-quizzes" class="tab-content">
+          <div class="tab-actions">
+            <button id="btn-admin-add-quiz" class="btn btn-primary">
+              + Add Quiz Question
+            </button>
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Scenario</th>
+                  <th>Question</th>
+                  <th>Correct Answer</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adm-quizzes-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div> <!-- End App Container -->
+
+  <!-- HAZARD IDENTIFICATION MODAL DIALOG -->
+  <div id="modal-hazard-spot" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="badge-tag red-tag" style="margin-bottom: 0.5rem;">⚠️ Hazard Identification Required</div>
+      <h3 id="spot-modal-title" style="font-size: 1.4rem; color: var(--text-main); margin-bottom: 0.5rem;">Targeted Object Identification</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        You targeted an active potential hazard. Select the correct hazard category to confirm your spotting:
+      </p>
+
+      <form id="form-hazard-spot">
+        <div class="category-options-grid">
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Spills & Slip Hazards" required>
+            <span class="cat-box">
+              <span class="cat-icon">🛢️</span>
+              <span class="cat-title">Spills & Slip Hazards</span>
+              <span class="cat-desc">Liquids, oils, chemical leaks</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Blocked Walkway & Debris">
+            <span class="cat-box">
+              <span class="cat-icon">📦</span>
+              <span class="cat-title">Blocked Walkway & Debris</span>
+              <span class="cat-desc">Pallets, boxes, trip clutter</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Electrical & Cable Risks">
+            <span class="cat-box">
+              <span class="cat-icon">⚡</span>
+              <span class="cat-title">Electrical & Cable Risks</span>
+              <span class="cat-desc">Exposed wiring, bare cables</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Shelving & Structural Damage">
+            <span class="cat-box">
+              <span class="cat-icon">🏗️</span>
+              <span class="cat-title">Shelving & Structure</span>
+              <span class="cat-desc">Buckled posts, bowed beams</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Fire & Emergency Obstructions">
+            <span class="cat-box">
+              <span class="cat-icon">🚪</span>
+              <span class="cat-title">Emergency Obstructions</span>
+              <span class="cat-desc">Blocked exit doors, hydrants</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Falling Objects & Stacking">
+            <span class="cat-box">
+              <span class="cat-icon">⚠️</span>
+              <span class="cat-title">Falling Objects & Stacking</span>
+              <span class="cat-desc">Teetering crates, unstable pallets</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Forklift & Vehicle Risks">
+            <span class="cat-box">
+              <span class="cat-icon">🚜</span>
+              <span class="cat-title">Forklift & Vehicle Risks</span>
+              <span class="cat-desc">Elevated loads, reversing equipment</span>
+            </span>
+          </label>
+
+          <label class="category-card">
+            <input type="radio" name="hazard_category" value="Visibility & Blind Spots">
+            <span class="cat-box">
+              <span class="cat-icon">👁️</span>
+              <span class="cat-title">Visibility & Blind Spots</span>
+              <span class="cat-desc">High stacks at corners, dark areas</span>
+            </span>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">
+            Confirm Category (+20 Pts)
+          </button>
+          <button type="button" id="btn-spot-cancel" class="btn btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SPOT CONFIRMATION FEEDBACK MODAL -->
+  <div id="modal-spot-feedback" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 520px; text-align: center;">
+      <div id="fb-icon" style="font-size: 3rem; margin-bottom: 0.5rem;">✅</div>
+      <h3 id="fb-title" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-yellow);">Correct Hazard Spotting!</h3>
+      <div id="fb-score-tag" class="badge-tag green-tag" style="font-size: 1rem; margin-bottom: 1rem;">+20 POINTS</div>
+      <p id="fb-explanation" style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem;">Risk explanation...</p>
+      
+      <div style="background: rgba(30, 41, 59, 0.6); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-yellow); text-align: left; margin-bottom: 1.5rem;">
+        <strong style="color: var(--accent-yellow); font-size: 0.9rem;">Recommended Safety Response:</strong>
+        <p id="fb-recommendation" style="font-size: 0.88rem; color: var(--text-main); margin-top: 4px;">Safety recommendation text...</p>
+      </div>
+
+      <button id="btn-fb-continue" class="btn btn-primary" style="width: 100%;">
+        Continue Exploring Warehouse
+      </button>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION MODAL -->
+  <div id="modal-auth" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px;">
+      <button id="modal-auth-close" class="modal-close">&times;</button>
+
+      <div class="auth-tabs">
+        <button id="auth-tab-login" class="auth-tab active">Player Portal Login</button>
+        <button id="auth-tab-admin-login" class="auth-tab">Admin Login</button>
+        <button id="auth-tab-register" class="auth-tab">Register Player</button>
+      </div>
+
+      <div id="auth-alert" class="auth-alert" style="display: none;"></div>
+
+      <!-- PLAYER LOGIN FORM -->
+      <form id="form-login" class="auth-form active">
+        <div style="margin-bottom: 1rem; text-align: center; color: var(--accent-yellow); font-size: 0.9rem; font-weight: 700;">
+          🎮 PLAYER & TRAINEE SIGN IN
+        </div>
+        <div class="form-group">
+          <label>Username or Email</label>
+          <input type="text" id="login-username" class="form-input" placeholder="e.g. player1 or operator@warehouse.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Sign In to Player Portal
+        </button>
+        <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 1rem;">
+          Demo Player Credential: <strong>player1</strong> / <strong>player123</strong>
+        </div>
+      </form>
+
+      <!-- ADMIN LOGIN FORM -->
+      <form id="form-admin-login" class="auth-form">
+        <div style="margin-bottom: 1rem; text-align: center; color: var(--accent-purple); font-size: 0.9rem; font-weight: 700;">
+          🛡️ SAFETY INSTRUCTOR & ADMIN SIGN IN
+        </div>
+        <div class="form-group">
+          <label>Admin Username or Email</label>
+          <input type="text" id="admin-login-username" class="form-input" placeholder="e.g. admin" required>
+        </div>
+        <div class="form-group">
+          <label>Admin Password</label>
+          <input type="password" id="admin-login-password" class="form-input" placeholder="Enter admin password" required>
+        </div>
+        <button type="submit" class="btn btn-admin" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">
+          Sign In to Admin Portal
+        </button>
+        <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 1rem;">
+          Seed Admin Credential: <strong>admin</strong> / <strong>admin123</strong>
+        </div>
+      </form>
+
+      <!-- REGISTRATION FORM -->
+      <form id="form-register" class="auth-form">
+        <div style="margin-bottom: 1rem; text-align: center; color: var(--accent-green); font-size: 0.9rem; font-weight: 700;">
+          📝 CREATE NEW PLAYER TRAINEE ACCOUNT
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-fullname" class="form-input" placeholder="e.g. Sarah Jenkins" required>
+        </div>
+        <div class="form-group">
+          <label>Choose Username</label>
+          <input type="text" id="reg-username" class="form-input" placeholder="e.g. s_jenkins" required>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="operator@logistics-auto.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" class="form-input" placeholder="At least 4 characters" required minlength="4">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="reg-confirm-password" class="form-input" placeholder="Re-enter password" required minlength="4">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Create Player Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PLAYER HISTORY & PROFILE MODAL -->
+  <div id="modal-history" class="modal-backdrop">
+    <div class="modal-card card-wide" style="max-width: 700px;">
+      <button id="modal-history-close" class="modal-close">&times;</button>
+      <h3 style="font-size: 1.4rem; color: var(--accent-yellow); margin-bottom: 0.5rem;">📜 Personal Hazard Perception History</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+        Your complete session logs stored persistently in SQLite.
+      </p>
+
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1rem;">
+        <div class="stat-card" style="padding: 0.75rem;">
+          <div class="stat-num" id="ph-total-attempts" style="font-size: 1.5rem;">0</div>
+          <div class="stat-label">Total Attempts</div>
+        </div>
+        <div class="stat-card" style="padding: 0.75rem;">
+          <div class="stat-num" id="ph-best-score" style="font-size: 1.5rem; color: var(--accent-green);">0 / 100</div>
+          <div class="stat-label">Highest Score</div>
+        </div>
+        <div class="stat-card" style="padding: 0.75rem;">
+          <div class="stat-num" id="ph-avg-score" style="font-size: 1.5rem; color: var(--accent-blue);">0.0 / 100</div>
+          <div class="stat-label">Avg Score</div>
+        </div>
+      </div>
+
+      <div class="table-wrapper" style="max-height: 300px; overflow-y: auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Scenario</th>
+              <th>Score (Max 100)</th>
+              <th>Accuracy</th>
+              <th>Avg Reaction</th>
+            </tr>
+          </thead>
+          <tbody id="ph-history-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE / HELP MODAL -->
+  <div id="modal-pause" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 480px; text-align: center;">
+      <h3 style="font-size: 1.5rem; color: var(--accent-yellow); margin-bottom: 0.5rem;">⏸️ Simulation Paused</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Take a breath. Adjust camera settings or resume your hazard perception test.
+      </p>
+
+      <div style="margin-bottom: 1.5rem; text-align: left; background: rgba(30, 41, 59, 0.6); padding: 1rem; border-radius: 8px;">
+        <label style="display: block; font-size: 0.9rem; margin-bottom: 0.5rem;">Mouse & Touchpad Sensitivity</label>
+        <input type="range" id="sensitivity-slider" min="1" max="10" value="5" style="width: 100%;">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <button id="btn-pause-resume" class="btn btn-primary btn-lg">
+          Resume Simulation
+        </button>
+        <button id="btn-pause-quit" class="btn btn-secondary">
+          Quit Scenario to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- MODULE SCRIPTS -->
+  <script src="js/warehouse-scene.js"></script>
+  <script src="js/scenario-builder.js"></script>
+  <script src="js/player-controls.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
